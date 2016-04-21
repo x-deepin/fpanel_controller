@@ -17,10 +17,11 @@ usage: fpanel_control {A|B|C|D} [delay seconds]
 
 
 # 编译依赖
-- libftdi1-2 (这个库在debian上打包有问题，无法正常编译．需要手动执行
+ibftdi1-2 (这个库在debian上打包有问题，无法正常编译．需要手动执行
 
   ```
   cd ln -sv /usr/lib/架构目录/
   sudo ln -sv libftdi1.so.2.2.0 libftdi1.so
   ```
 
+```go get github.com/x-deepin/fpanel_controler```
