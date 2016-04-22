@@ -9,7 +9,7 @@ import (
 
 func usage() {
 	fmt.Println(`
-usage: fpanel_control {A|B|C|D} [delay seconds,default 1(s)]
+usage: fpanel_control {1|2|3|4} [-d delay seconds,default 1(s)]
 `)
 	os.Exit(-1)
 }
