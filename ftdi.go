@@ -28,25 +28,24 @@ func NewFtdiContext() (*FtdiContext, error) {
 	ctx := &FtdiContext{
 		core: core,
 	}
-	ctx.load()
 	err := ctx.open()
 	if err != nil {
 		ctx.Close()
 	}
-	ctx.enableBitBang()
+	err = ctx.enableBitBang()
+
+	ctx.load()
+
 	return ctx, err
 }
 
-func (ctx *FtdiContext) Enable(pin PinName, enable bool) {
+func (ctx *FtdiContext) Enable(pin PinName, enable bool) error {
 	if enable {
 		ctx.cachedValue |= int(pin)
 	} else {
 		ctx.cachedValue &= ^int(pin)
 	}
-	err := ctx.update()
-	if err != nil {
-		fmt.Println("E:", err)
-	}
+	return ctx.update()
 }
 
 func (ctx *FtdiContext) load() error {
@@ -74,15 +73,21 @@ func (ctx *FtdiContext) fatal(fmtStr string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, fmtStr, args...)
 }
 
-func (ctx *FtdiContext) enableBitBang() {
+func (ctx *FtdiContext) enableBitBang() error {
 	if C.ftdi_set_bitmode(ctx.core, 0xFF, C.BITMODE_BITBANG) < 0 {
-		ctx.fatal("Can't enable bitbang")
+		return fmt.Errorf("Can't enable bitbang")
 	}
+	return nil
 }
 
+const (
+	VendorID  = 0x0403
+	ProductID = 0x6001
+)
+
 func (c *FtdiContext) open() error {
-	if C.ftdi_usb_open(c.core, 0x0403, 0x6001) < 0 {
-		fmt.Errorf("Can't open ftdi device")
+	if C.ftdi_usb_open(c.core, VendorID, ProductID) < 0 {
+		return fmt.Errorf("Can't open ftdi device")
 	}
 	return nil
 }

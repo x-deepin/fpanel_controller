@@ -1,9 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -13,39 +13,74 @@ usage: fpanel_control {A|B|C|D} [delay seconds,default 1(s)]
 `)
 	os.Exit(-1)
 }
+
+var Delay = flag.Int("d", 1, "hold on time in seconds.")
+var All = flag.Bool("a", false, "control all pin.")
+
+var PinTable = map[string]PinName{
+	"1": PinCTS,
+	"2": PinTXD,
+	"3": PinRXD,
+	"4": PinDTR,
+}
+
 func main() {
-
-	if len(os.Args) != 3 {
-		usage()
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s pin1 [pin2...]\n", os.Args[0])
+		flag.PrintDefaults()
+		fmt.Fprintln(os.Stderr)
+		fmt.Fprintln(os.Stderr, "Current support pins")
+		fmt.Fprintln(os.Stderr, "  1  ->  CTS")
+		fmt.Fprintln(os.Stderr, "  2  ->  TXD")
+		fmt.Fprintln(os.Stderr, "  3  ->  RXD")
+		fmt.Fprintln(os.Stderr, "  4  ->  DTR")
 	}
-	var pin PinName
-	switch os.Args[1] {
-	case "A":
-		pin = PinCTS
-	case "B":
-		pin = PinTXD
-	case "C":
-		pin = PinRXD
-	case "D":
-		pin = PinDTR
-	default:
-		usage()
+	flag.Parse()
+
+	var pins = make(map[PinName]struct{})
+
+	if *All {
+		for _, v := range PinTable {
+			pins[v] = struct{}{}
+		}
+	} else {
+		for _, v := range flag.Args() {
+			pin, ok := PinTable[v]
+			if !ok {
+				fmt.Printf("W:invlid pin number :%v\n", v)
+				continue
+			}
+			pins[pin] = struct{}{}
+		}
 	}
 
-	delay, err := strconv.Atoi(os.Args[2])
+	var r []PinName
+	for v := range pins {
+		r = append(r, v)
+	}
+	err := Hold(*Delay, r...)
 	if err != nil {
-		fmt.Printf("E:", err)
-		usage()
+		fmt.Printf("Hold E:%v\n", err)
 	}
+}
 
+func Hold(delay int, pins ...PinName) error {
 	ctx, err := NewFtdiContext()
 	if err != nil {
-		fmt.Println("E:", err)
-		return
+		return err
 	}
+
 	defer ctx.Close()
 
-	ctx.Enable(pin, true)
+	for _, pin := range pins {
+		ctx.Enable(pin, true)
+	}
+
 	<-time.After(time.Second * time.Duration(delay))
-	ctx.Enable(pin, false)
+
+	for _, pin := range pins {
+		ctx.Enable(pin, false)
+	}
+
+	return nil
 }
