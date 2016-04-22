@@ -1,7 +1,7 @@
 # fpanel_control
 
 ```
-Usage of ./fpanel_controler pin1 [pin2...]
+Usage of ./fpanel_controller pin1 [pin2...]
   -a	control all pin.
   -d int
     	hold on time in seconds. (default 1)
@@ -31,4 +31,4 @@ ibftdi1-2 (这个库在debian上打包有问题，无法正常编译．需要手
   sudo ln -sv libftdi1.so.2.2.0 libftdi1.so
   ```
 
-```go get github.com/x-deepin/fpanel_controler```
+```go get github.com/x-deepin/fpanel_controller```
