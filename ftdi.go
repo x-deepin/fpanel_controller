@@ -58,7 +58,7 @@ func (ctx *FtdiContext) load() error {
 func (ctx *FtdiContext) update() error {
 	d := C.uchar(ctx.cachedValue)
 	if C.ftdi_write_data(ctx.core, &d, 1) < 0 {
-		return fmt.Errorf("write failed for 0x%x: %s\n", ctx.cachedValue,
+		return fmt.Errorf("Write failed for 0x%x: %s\n", ctx.cachedValue,
 			C.GoString(C.ftdi_get_error_string(ctx.core)))
 	}
 	return nil

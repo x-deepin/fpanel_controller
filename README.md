@@ -1,4 +1,4 @@
-# fpanel_control
+# fpanel_controller
 
 ```
 Usage of ./fpanel_controller pin1 [pin2...]
@@ -27,7 +27,7 @@ Current support pins
 ibftdi1-2 (这个库在debian上打包有问题，无法正常编译．需要手动执行
 
   ```
-  cd ln -sv /usr/lib/架构目录/
+  cd /usr/lib/*架构目录*/
   sudo ln -sv libftdi1.so.2.2.0 libftdi1.so
   ```
 

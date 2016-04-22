@@ -7,15 +7,8 @@ import (
 	"time"
 )
 
-func usage() {
-	fmt.Println(`
-usage: fpanel_control {A|B|C|D} [delay seconds,default 1(s)]
-`)
-	os.Exit(-1)
-}
-
 var Delay = flag.Int("d", 1, "hold on time in seconds.")
-var All = flag.Bool("a", false, "control all pin.")
+var All = flag.Bool("a", false, "control all pins.")
 
 var PinTable = map[string]PinName{
 	"1": PinCTS,
@@ -47,7 +40,7 @@ func main() {
 		for _, v := range flag.Args() {
 			pin, ok := PinTable[v]
 			if !ok {
-				fmt.Printf("W:invlid pin number :%v\n", v)
+				fmt.Printf("W:invalid pin number :%v\n", v)
 				continue
 			}
 			pins[pin] = struct{}{}
